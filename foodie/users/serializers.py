@@ -6,8 +6,18 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name',)
-        read_only_fields = ('username', )
+        fields = ('id', 'username', 'first_name', 'last_name', 'email',
+                    'phone_number', 'avatar', 'is_premium', 'reputation')
+        read_only_fields = ('username', 'is_premium', 'reputation')
+
+
+class PublicUserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'first_name', 'last_name', 'avatar', 'is_premium',
+                    'reputation')
+
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
@@ -20,6 +30,6 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'password', 'first_name', 'last_name', 'email', 'auth_token',)
-        read_only_fields = ('auth_token',)
+        fields = ('id', 'username', 'password', 'first_name', 'last_name', 'email',
+                    'phone_number', 'avatar')
         extra_kwargs = {'password': {'write_only': True}}

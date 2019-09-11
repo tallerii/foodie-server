@@ -1,26 +1,24 @@
 from rest_framework import viewsets, mixins
-from rest_framework.permissions import AllowAny
 from .models import User
-from .permissions import IsUserOrReadOnly
-from .serializers import CreateUserSerializer, UserSerializer
-
+from .permissions import UsersPermissions
+from .serializers import CreateUserSerializer, UserSerializer, PublicUserSerializer
+from django_filters.rest_framework import DjangoFilterBackend
 
 class UserViewSet(mixins.RetrieveModelMixin,
                   mixins.UpdateModelMixin,
+                  mixins.ListModelMixin,
+                  mixins.CreateModelMixin,
                   viewsets.GenericViewSet):
     """
     Updates and retrieves user accounts
     """
     queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = (IsUserOrReadOnly,)
+    permission_classes = (UsersPermissions,)
+    filter_backends = [DjangoFilterBackend]
 
-
-class UserCreateViewSet(mixins.CreateModelMixin,
-                        viewsets.GenericViewSet):
-    """
-    Creates user accounts
-    """
-    queryset = User.objects.all()
-    serializer_class = CreateUserSerializer
-    permission_classes = (AllowAny,)
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return PublicUserSerializer
+        if self.action == 'create':
+            return CreateUserSerializer
+        return UserSerializer
