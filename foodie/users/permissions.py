@@ -10,8 +10,8 @@ class UsersPermissions(permissions.BasePermission):
 
         if view.action == 'list':
             return request.user
-        
+
         if view.action == 'create':
             return True
-        
+
         return obj == request.user
