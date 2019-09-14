@@ -17,7 +17,7 @@ phone_regex = RegexValidator(
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     phone_number = models.CharField(validators=[phone_regex], max_length=17, null=True)
-    avatar = models.ImageField(null=True)
+    # avatar = models.ImageField(null=True)
     is_premium = models.BooleanField(default=False)
     reputation = models.FloatField(default=2.5)
 
