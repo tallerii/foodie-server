@@ -10,7 +10,7 @@ script:
 - docker-compose run --rm web bash -c "python wait_for_postgres.py && python manage.py
   test"
 after_success:
-- if [ "$TRAVIS_BRANCH" == "master" ]; then docker login --username=_ --password="$HEROKU_AUTH_TOKEN"
+- if [ "$TRAVIS_BRANCH" == "master" ]; then docker login -u _ -p $HEROKU_AUTH_TOKEN
   registry.heroku.com; docker tag web registry.heroku.com/foodie-prod-matias/web; docker
   push registry.heroku.com/foodie-prod-matias/web; fi
 - if [ "$TRAVIS_BRANCH" == "qa" ]; then docker login --username=_ --password="$HEROKU_AUTH_TOKEN"
