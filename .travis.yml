@@ -7,19 +7,19 @@ python:
 before_script:
 - docker-compose build
 script:
-- docker-compose run --rm web bash -c "python wait_for_postgres.py &&
-  python manage.py test"
+- docker-compose run --rm web bash -c "python wait_for_postgres.py && python manage.py
+  test"
 after_success:
 - if [ "$TRAVIS_BRANCH" == "master" ]; then docker login --username=_ --password="$HEROKU_AUTH_TOKEN"
-  registry.heroku.com; docker tag web registry.heroku.com/foodie-prod/web; docker
-  push registry.heroku.com/foodie-prod/web; fi
+  registry.heroku.com; docker tag web registry.heroku.com/foodie-prod-matias/web; docker
+  push registry.heroku.com/foodie-prod-matias/web; fi
 - if [ "$TRAVIS_BRANCH" == "qa" ]; then docker login --username=_ --password="$HEROKU_AUTH_TOKEN"
-  registry.heroku.com; docker tag web registry.heroku.com/foodie-qa/web; docker push
-  registry.heroku.com/foodie-qa/web; fi
+  registry.heroku.com; docker tag web registry.heroku.com/foodie-qa-matias/web; docker push
+  registry.heroku.com/foodie-qa-matias/web; fi
 notifications:
   email: false
 cache:
   pip: true
 env:
   global:
-    secure: FPeoCerV1qD6JIaO+iu4RuY3nI06QIzKunT2lqXYgIGhtl6lEkZHO+1H3QaPSnlE0qTA4+aNcX9rt3C1GKEZXgeeYoZJo+nm0S+gPMWhs6aglrcCX0CE8lsD+khgEQXiwNho0F9eItAKlAeTcx/kYqe9v8/PMCoHdavBc0XyjW3G4ZjIN/c66vBVcSQ75eFI9/EDS5BbTePnWVEZvBSkbUXUDfJgYbKO+VWvRfB+NhIFoKHXBVJSt1yGj1YdNRkPO3RM0CfQ0A/TQ6oj8G7tU59pIclzXLhJIm9p+cw9ynz4ilfl/UMjnJmHrlJvYMwqZsTAUwiupdku7g7t1ciew+PuvEvC+q8pwkzvRKxq8wbiT70kp5Y0yoCbVHxYt17TdocF9CfPv8YZasNwUgiBa+VGQBnw1mCSu6UVpJnWT4+pkeOjRGHOdiS/tLWCAwdz3tAugy67zXLdqYzIfed4+B1gFQ+fpbuDFkOXOT2WrIqLvbIwHQUtkG8YW3yFPSTIkVkxZsRsJ6F0dv8pPmg76P3Y9wimjnpoFE/V8EhYuRg1cCQKqwLMmB71KdntcuevxpBW9fjuVQwBdfam1YWpA9tvyCvYdREjepDwDeHbE5qGBcLKwLrjHdXFqgVBE18iBUgDKw02NrFBiCe2juxn39UpHFd41PPMqcF7OHWoM/E=
+  - secure: ITOJgUynfoHv9v6EwKBfUXmSRA8ztaO//sRhcOLIPkLgNEesCtqnyQrO7QpSi0JzcIHqXX4ZItgLkf22p5QbDQTjj5+kB0UwqHT4mi/fqgOxwOfuAGFqfIg5ktB1hwdlicvq9y1JN/zbZK/PJEhBsAdrabSgSInIBVN0MTnSzdKdnmK+usKa2EymsAZWWJ5yf1w09AWlT0zjFYj+Z0+kJmGhbnUsE0tYtkvXz4lkfwNhdI2hR8CuMqJGaUiov9SHFwG9jO/U6WVnkqd4MqPXnPZXcwkWcr+apR+A9ODsFx7VZWdRF2S2Ck7coCgViOfmOMhmDY/zkyu7lLOHdGFdPsmiy0Ew10fjl1Ci64GebtmcB4i8Gocvio+QbvudyIs+suPmXNI8E9bX8iouKif/Jza+neghc39bY5hsyf/ei95/BYTgi+ymFTMXl6dEG2to2DBbjoDKPTvRtWbxGN/SAk50YfgIjYAXVkr47o9L4WfOkMNzL1FwqP/A7OEvDrNWzZcW8V5EIQNuISs/qAcomii4i1YHv4bFHbwnab/McYuKZT+xI24+7dYTKRqmOso3PMzUwZeOFSq82++JnDEj/PZ21Kr++H67EqS1LszbOpt058NubgWxqrZy4ouBYdUZXDpS8p0NcQucVKGzYeosghrwUaKXbv4JMObcrx4eH9g=
