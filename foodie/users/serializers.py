@@ -2,12 +2,12 @@ from rest_framework import serializers
 from .models import User
 
 
-class UserSerializer(serializers.ModelSerializer):
+class PrivateUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email',
-                    'phone_number', 'is_premium', 'reputation')
+        fields = ('id', 'username', 'avatar', 'first_name', 'last_name', 'email',
+                  'phone_number', 'is_premium', 'is_delivery', 'reputation')
         read_only_fields = ('username', 'is_premium', 'reputation')
 
 
@@ -15,8 +15,8 @@ class PublicUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'is_premium',
-                    'reputation')
+        fields = ('id', 'username', 'avatar', 'first_name', 'last_name', 'is_premium',
+                  'is_delivery', 'reputation')
 
 
 
@@ -30,6 +30,13 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'password', 'first_name', 'last_name', 'email',
-                    'phone_number')
+        fields = ('id', 'username', 'avatar', 'password', 'first_name', 'last_name', 'email',
+                  'is_delivery', 'phone_number')
         extra_kwargs = {'password': {'write_only': True}}
+
+class LocationUserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'lat', 'lon', 'location_last_updated')
+        read_only_fields = ('username', 'location_last_updated')

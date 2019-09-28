@@ -1,6 +1,6 @@
 # foodie-server
 
-[![Build Status](https://travis-ci.org/MatiasMdelP/foodie-server.svg?branch=master)](https://travis-ci.org/tallerii/foodie-server)
+[![Build Status](https://travis-ci.org/tallerii/foodie-server.svg?branch=master)](https://travis-ci.org/tallerii/foodie-server)
 [![Built with](https://img.shields.io/badge/Built_with-Cookiecutter_Django_Rest-F7B633.svg)](https://github.com/agconti/cookiecutter-django-rest)
 
 Its all about a Weissman score > 5.0. Check out the project's [documentation](http://MatiasMdelP.github.io/foodie-server/).
