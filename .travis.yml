@@ -7,8 +7,7 @@ python:
 before_script:
 - docker-compose build
 script:
-- docker-compose run --rm web bash -c "python wait_for_postgres.py && python manage.py
-  test"
+- docker-compose run --rm web python manage.py test
 after_success:
 - if [ "$TRAVIS_BRANCH" == "master" ]; then docker login -u _ -p $HEROKU_AUTH_TOKEN
   registry.heroku.com; docker tag web registry.heroku.com/foodie-prod-matias/web; docker
