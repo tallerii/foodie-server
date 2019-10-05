@@ -8,7 +8,7 @@ before_script:
 - docker-compose build
 script:
 - docker-compose run --rm web python manage.py test
-after_success:
+deploy:
 - if [ "$TRAVIS_BRANCH" == "master" ]; then echo $HEROKU_AUTH_TOKEN | docker login -u _ --password-stdin
   registry.heroku.com; docker tag web registry.heroku.com/foodie-g4/web; docker
   push registry.heroku.com/foodie-g4/web; fi
