@@ -7,7 +7,6 @@ from rest_framework.decorators import action
 from .models import User
 from .permissions import UsersPermissions
 from .serializers import CreateUserSerializer, PrivateUserSerializer, PublicUserSerializer
-# from django_filters.rest_framework import DjangoFilterBackend
 from datetime import datetime
 
 class UserViewSet(mixins.RetrieveModelMixin,
@@ -18,12 +17,12 @@ class UserViewSet(mixins.RetrieveModelMixin,
     Updates and retrieves user accounts
     """
     permission_classes = (UsersPermissions,)
-    # filter_backends = [DjangoFilterBackend]
 
     def get_serializer_class(self):
         if self.action == 'create':
             return CreateUserSerializer
-        if self.action == 'retrieve' or self.action == 'update' or self.action == 'partial_update':
+        if ((self.action == 'retrieve' or self.action == 'update' or self.action == 'partial_update') and \
+           self.request.user == self.get_object()) or self.action == 'self':
             return PrivateUserSerializer
         return PublicUserSerializer
 
@@ -32,6 +31,14 @@ class UserViewSet(mixins.RetrieveModelMixin,
         if serializer.is_valid():
             serializer.save(is_delivery=is_delivery)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def update(self, request, *args, **kwargs):
+        user = self.get_object()
+        serializer = self.get_serializer_class()(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save(location_last_updated=datetime.now())
+            return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, *args, **kwargs):
@@ -44,7 +51,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
                 serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     @action(detail=False, methods=['get', 'patch', 'put', 'delete'])
     def self(self, request, *args, **kwargs):
         self.kwargs['pk'] = request.user.pk
@@ -52,20 +59,11 @@ class UserViewSet(mixins.RetrieveModelMixin,
         if request.method == 'GET':
             return self.retrieve(request, args, kwargs)
         elif request.method == 'PUT':
-            return self.partial_update(request, args, kwargs)
+            return self.update(request, args, kwargs)
         elif request.method == 'PATCH':
             return self.partial_update(request, args, kwargs)
         elif request.method == 'DELETE':
             return self.destroy(request, args, kwargs)
-
-    
-    def update(self, request, *args, **kwargs):
-        user = self.get_object()
-        serializer = self.get_serializer_class()(user, data=request.data)
-        if serializer.is_valid():
-            serializer.save(location_last_updated=datetime.now())
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DeliveryViewSet(UserViewSet):

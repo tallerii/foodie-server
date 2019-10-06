@@ -3,7 +3,7 @@ from django.contrib.auth.hashers import check_password
 from rest_framework.test import APITestCase
 from rest_framework import status
 from foodie.users.models import User
-from foodie.users.test.dummies import getUserDummy
+from foodie.users.test.dummies import getUserDummy, getUserDummy2
 
 
 class TestClientListTestCase(APITestCase):
@@ -125,21 +125,60 @@ class TestClientDetailTestCase(APITestCase):
     Tests /clients detail operations.
     """
     def setUp(self):
-        self.user_data = getUserDummy()
-        create_response = self.client.post(reverse('clients-list'), self.user_data)
-        credentials = {'username': self.user_data.get('username'), 'password': self.user_data.get('password')}
-        auth_token_response = self.client.post('/api-token-auth/', credentials)
+        self.self_data = getUserDummy()
+        self.other_data = getUserDummy2()
+        create_self_response = self.client.post(reverse('clients-list'), self.self_data)
+        create_other_response = self.client.post(reverse('clients-list'), self.other_data)
+        self_credentials = {'username': self.self_data.get('username'), 'password': self.self_data.get('password')}
+        auth_token_response = self.client.post('/api-token-auth/', self_credentials)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {auth_token_response.data.get("token")}')
-        user1Id = create_response.data.get('id')
-        self.url = reverse('clients-detail', kwargs={'pk': user1Id})
+        self_id = create_self_response.data.get('id')
+        other_id = create_other_response.data.get('id')
+        self.selfUrl = reverse('clients-detail', kwargs={'pk': self_id})
+        self.otherUrl = reverse('clients-detail', kwargs={'pk': other_id})
+        self.invalidUrl = reverse('clients-detail', kwargs={'pk': 'invalidpk'})
 
-    def test_get_request_with_invalid_pk_suceeds(self):
-        response = self.client.get(reverse('clients-detail', kwargs={'pk': 'invalidpk'}))
+    def test_get_request_with_invalid_pk_fails(self):
+        response = self.client.get(self.invalidUrl)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_get_request_with_valid_pk_suceeds(self):
-        response = self.client.get(self.url)
+    def test_get_request_with_valid_pk_from_same_client_suceeds(self):
+        response = self.client.get(self.selfUrl)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_request_with_valid_pk_from_other_client_suceeds(self):
+        response = self.client.get(self.otherUrl)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_request_with_valid_pk_from_same_user_returns_all_data(self):
+        response = self.client.get(self.selfUrl)
+        self.assertIn('username', response.data)
+        self.assertIn('avatar', response.data)
+        self.assertIn('first_name', response.data)
+        self.assertIn('last_name', response.data)
+        self.assertIn('email', response.data)
+        self.assertIn('phone_number', response.data)
+        self.assertIn('is_premium', response.data)
+        self.assertIn('is_delivery', response.data)
+        self.assertIn('reputation', response.data)
+        self.assertIn('lat', response.data)
+        self.assertIn('lon', response.data)
+        self.assertIn('location_last_updated', response.data)
+
+    def test_get_request_with_valid_pk_from_other_user_returns_public_data_only(self):
+        response = self.client.get(self.otherUrl)
+        self.assertIn('username', response.data)
+        self.assertIn('avatar', response.data)
+        self.assertIn('first_name', response.data)
+        self.assertIn('last_name', response.data)
+        self.assertNotIn('email', response.data)
+        self.assertNotIn('phone_number', response.data)
+        self.assertIn('is_premium', response.data)
+        self.assertIn('is_delivery', response.data)
+        self.assertIn('reputation', response.data)
+        self.assertIn('lat', response.data)
+        self.assertIn('lon', response.data)
+        self.assertIn('location_last_updated', response.data)
 
     # def test_put_request_updates_a_user(self):
     #     new_first_name = fake.first_name()
