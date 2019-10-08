@@ -16,7 +16,6 @@ INSTALLED_APPS = (
     # Third party apps
     'rest_framework',            # utilities for rest apis
     'rest_framework.authtoken',  # token authentication
-    'django_filters',            # for filtering rest endpoints
 
     # Your apps
     'foodie.users',
