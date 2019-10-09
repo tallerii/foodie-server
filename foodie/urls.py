@@ -6,6 +6,7 @@ from rest_framework.routers import DefaultRouter
 
 from rest_framework.authtoken import views
 from .users.views import DeliveryViewSet, ClientViewSet
+from .users.social_media_token.views import facebookLoginView
 
 router = DefaultRouter()
 router.register(r'clients', ClientViewSet, 'clients')
@@ -13,6 +14,7 @@ router.register(r'deliveries', DeliveryViewSet, 'deliveries')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('api-token-auth/', views.obtain_auth_token),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('token-auth/username/', views.obtain_auth_token),
+    path('token-auth/facebook/', facebookLoginView),
+    path('auth/', include('rest_framework.urls', namespace='rest_framework')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -5,6 +5,9 @@ services:
     image: postgres
   web:
     build: ./
+    environment:
+      - FACEBOOK_APP_ID=2541386966092751
+      - FACEBOOK_APP_SECRET=af0f510998181e7aa367c08e38a3498f
     command: >
       bash -c "python wait_for_postgres.py
                python manage.py migrate &&
