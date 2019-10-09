@@ -7,8 +7,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'price')
-        read_only_fields = ('shop',)
+        fields = ('id', 'shop', 'name', 'description', 'price')
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -23,4 +22,4 @@ class ItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Item
-        fields = ('id', 'order', 'quantity', 'notes', 'product')
+        fields = ('id', 'order', 'product', 'quantity', 'notes')
