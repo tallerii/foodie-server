@@ -10,16 +10,10 @@ from foodie.users.models import User
 class Order(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     notes = models.CharField(max_length=100, null=True)
-<<<<<<< Updated upstream
-    delivery_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="delivered_orders",
-                                      limit_choices_to={'is_delivery': True})
-    client_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders_made",
-=======
     # TODO: DeliveryUser and ClientUser shouldn't be User subclasses instead of a flag?
     delivery_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='delivered_orders',
                                       limit_choices_to={'is_delivery': True})
     client_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders_made',
->>>>>>> Stashed changes
                                     limit_choices_to={'is_delivery': False})
     date_time_ordered = models.DateTimeField(auto_now_add=True)
 
