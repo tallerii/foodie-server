@@ -14,7 +14,7 @@ after_success:
     docker tag foodie-server_web registry.heroku.com/foodie-g4/web;
     docker push registry.heroku.com/foodie-g4/web;
     fi
-  - coverage run --source='.' manage.py test
+  - docker-compose run --rm web bash -c "coverage run --source='.' manage.py test; coveralls"
 notifications:
   email: false
 cache:
