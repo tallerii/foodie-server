@@ -12,9 +12,11 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
 
     # Third party apps
     'rest_framework',            # utilities for rest apis
+    'rest_framework_gis',
     'rest_framework.authtoken',  # token authentication
     'social_django',    # social media login
 

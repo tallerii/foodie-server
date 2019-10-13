@@ -1,5 +1,5 @@
 import uuid
-from django.db import models
+from django.contrib.gis.db import models
 from django.conf import settings
 from django.dispatch import receiver
 from django.contrib.auth.models import AbstractUser
@@ -7,7 +7,6 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.db.models.signals import post_save
 from rest_framework.authtoken.models import Token
 from django.core.validators import RegexValidator
-from datetime import datetime
 
 phone_regex = RegexValidator(
     regex=r'^\+?1?\d{9,15}$',
@@ -22,8 +21,7 @@ class User(AbstractUser):
     is_delivery = models.BooleanField(default=False)
     is_premium = models.BooleanField(default=False)
     reputation = models.FloatField(default=2.5)
-    lat = models.DecimalField(max_digits=9, decimal_places=6, default=None, null=True, blank=True)
-    lon = models.DecimalField(max_digits=9, decimal_places=6, default=None, null=True, blank=True)
+    last_location = models.PointField(default=None, null=True)
     location_last_updated = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

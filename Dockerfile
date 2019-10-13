@@ -8,6 +8,9 @@ WORKDIR /code
 # Allows docker to cache installed dependencies between builds
 COPY requirements.txt /code/
 RUN pip install -r requirements.txt
+RUN apt-get update
+RUN apt-get upgrade -y
+RUN apt-get install binutils libproj-dev gdal-bin -y
 
 # Adds our application code to the image
 COPY . /code/

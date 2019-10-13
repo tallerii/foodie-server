@@ -7,7 +7,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.authtoken import views
 
 from foodie.orders.views import ProductViewSet, OrderViewSet, ItemViewSet
-from .users.views import DeliveryViewSet, ClientViewSet
+from .users.views import DeliveryViewSet, ClientViewSet, NearDeliveryList
 from .users.social_media_token.views import facebookLoginView
 
 router = DefaultRouter()
@@ -16,6 +16,7 @@ router.register(r'items', ItemViewSet, 'items')
 router.register(r'products', ProductViewSet, 'products')
 router.register(r'clients', ClientViewSet, 'clients')
 router.register(r'deliveries', DeliveryViewSet, 'deliveries')
+router.register(r'near_deliveries', NearDeliveryList, 'near_deliveries')
 
 urlpatterns = [
     path('', include(router.urls)),
