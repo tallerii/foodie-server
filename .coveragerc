@@ -7,4 +7,5 @@ omit = *migrations*,
        ./manage.py,
        ./foodie/config/*,
        ./foodie/wsgi.py,
+       ./wait_for_postgres.py
        *__init__*

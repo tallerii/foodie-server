@@ -16,7 +16,6 @@ INSTALLED_APPS = (
     # Third party apps
     'rest_framework',            # utilities for rest apis
     'rest_framework.authtoken',  # token authentication
-    'social_django',    # social media login
 
     # Your apps
     'foodie.users',
@@ -165,8 +164,8 @@ LOGGING = {
 
 # Authentications
 AUTHENTICATION_BACKENDS = [
-    'social_core.backends.facebook.FacebookOAuth2',
     'django.contrib.auth.backends.ModelBackend',
+    'foodie.backends.FacebookBackend',
 ]
 
 # Custom user app
@@ -187,6 +186,5 @@ REST_FRAMEWORK = {
     )
 }
 
-SOCIAL_AUTH_FACEBOOK_KEY = os.environ.get('FACEBOOK_APP_ID')
-SOCIAL_AUTH_FACEBOOK_SECRET = os.environ.get('FACEBOOK_APP_SECRET')
-SOCIAL_AUTH_POSTGRES_JSONFIELD = True
+FACEBOOK_APP_ID = os.environ.get('FACEBOOK_APP_ID')
+FACEBOOK_APP_SECRET = os.environ.get('FACEBOOK_APP_SECRET')
