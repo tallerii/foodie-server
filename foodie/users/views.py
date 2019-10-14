@@ -1,13 +1,14 @@
-from django.shortcuts import redirect
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import Http404
+from datetime import datetime
+
 from rest_framework import viewsets, mixins, status
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework_gis.filters import DistanceToPointFilter
+
 from .models import User
 from .permissions import UsersPermissions
 from .serializers import CreateUserSerializer, PrivateUserSerializer, PublicUserSerializer, PasswordSerializer
-from datetime import datetime
+
 
 class UserViewSet(mixins.RetrieveModelMixin,
                   mixins.ListModelMixin,
@@ -54,19 +55,11 @@ class UserViewSet(mixins.RetrieveModelMixin,
         serializer = self.get_serializer(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
 
-        if 'lat' in serializer.validated_data or 'lon' in serializer.validated_data:
+        if 'last_location' in serializer.validated_data:
             serializer.save(location_last_updated=datetime.now())
         else:
             serializer.save()
         return Response(serializer.data)
-
-    # @action(detail=True, methods=['post'])
-    # def set_password(self, request, pk=None):
-    #     user = self.get_object()
-    #     serializer = self.get_serializer(user, data=request.data, partial=True)
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save()
-    #     return Response({'status': 'password set'})
 
 
 class DeliveryViewSet(UserViewSet):
@@ -78,6 +71,7 @@ class DeliveryViewSet(UserViewSet):
     def create(self, request, *args, **kwargs):
         return super().create(request, is_delivery=True)
 
+
 class ClientViewSet(UserViewSet):
     """
     Updates and retrieves clients
@@ -86,3 +80,14 @@ class ClientViewSet(UserViewSet):
 
     def create(self, request, *args, **kwargs):
         return super().create(request, is_delivery=False)
+
+
+class NearDeliveryList(ListAPIView, viewsets.GenericViewSet):
+    """
+    The dist parameter is implicit:
+    /near_deliveries/?dist=radious&point=x,y&format=json
+    """
+    queryset = User.objects.filter(is_delivery=True)
+    serializer_class = PublicUserSerializer
+    distance_filter_field = 'last_location'
+    filter_backends = (DistanceToPointFilter, )

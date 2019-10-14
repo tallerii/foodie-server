@@ -1,7 +1,7 @@
 # foodie-server
 
 [![Build Status](https://travis-ci.org/tallerii/foodie-server.svg?branch=master)](https://travis-ci.org/tallerii/foodie-server)
-
+[![Coverage Status](https://coveralls.io/repos/github/tallerii/foodie-server/badge.svg?branch=master)](https://coveralls.io/github/tallerii/foodie-server?branch=master)
 # Prerequisites
 
 - [Docker](https://docs.docker.com/docker-for-mac/install/)  

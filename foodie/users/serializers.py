@@ -1,26 +1,32 @@
 from rest_framework import serializers
+from rest_framework_gis.serializers import GeoFeatureModelSerializer
+
 from .models import User
 
 
-class PrivateUserSerializer(serializers.ModelSerializer):
+class PrivateUserSerializer(GeoFeatureModelSerializer):
 
     class Meta:
         model = User
+        geo_field = 'last_location'
+
         fields = ('id', 'username', 'avatar', 'first_name', 'last_name', 'email',
                   'phone_number', 'is_premium', 'is_delivery', 'reputation',
-                  'lat', 'lon', 'location_last_updated')
+                  'location_last_updated')
         read_only_fields = ('username', 'is_premium', 'reputation', 'location_last_updated')
 
 
-class PublicUserSerializer(serializers.ModelSerializer):
+class PublicUserSerializer(GeoFeatureModelSerializer):
 
     class Meta:
         model = User
+        geo_field = 'last_location'
+
         fields = ('id', 'username', 'avatar', 'first_name', 'last_name', 'is_premium',
-                  'is_delivery', 'reputation', 'lat', 'lon', 'location_last_updated')
+                  'is_delivery', 'reputation', 'location_last_updated')
 
 
-class CreateUserSerializer(serializers.ModelSerializer):
+class CreateUserSerializer(GeoFeatureModelSerializer):
 
     def create(self, validated_data):
         # call create_user on user object. Without this
@@ -30,6 +36,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
+        geo_field = 'last_location'
         fields = ('id', 'username', 'password', 'avatar', 'first_name', 'last_name', 'email',
                   'phone_number')
         extra_kwargs = {'password': {'write_only': True}}
