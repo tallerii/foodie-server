@@ -1,25 +1,17 @@
 from rest_framework import serializers
+from rest_framework_gis.fields import GeometryField
+from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
-from .models import Product, Order, Item
-
-
-class ProductSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Product
-        fields = ('id', 'shop', 'name', 'description', 'price')
+from .models import Order
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    start_location = GeometryField()
+    end_location = GeometryField()
+    actual_location = GeometryField()
 
     class Meta:
         model = Order
-        fields = ('id', 'notes', 'delivery_user', 'client_user', 'date_time_ordered')
-        read_only_fields = ('client_user', 'date_time_ordered')
-
-
-class ItemSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Item
-        fields = ('id', 'order', 'product', 'quantity', 'notes')
+        fields = ('id', 'notes', 'date_time_ordered', 'start_location', 'end_location', 'actual_location')
+        read_only_fields = ('delivery_user', 'date_time_ordered',
+                            'delivered', 'price', 'client_user')
