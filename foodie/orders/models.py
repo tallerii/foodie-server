@@ -15,10 +15,10 @@ class Order(models.Model):
                                     limit_choices_to={'is_delivery': False})
     delivered = models.BooleanField(default=False)
     date_time_ordered = models.DateTimeField(auto_now_add=True)
-    price = models.FloatField(default=0)
-    start_location = models.PointField(default=Point(0, 0))
-    end_location = models.PointField(default=Point(0, 0))
-    actual_location = models.PointField(default=Point(0, 0))
+    price = models.FloatField(blank=True, null=True)
+    start_location = models.PointField(blank=True, null=True)
+    end_location = models.PointField(blank=True, null=True)
+    actual_location = models.PointField(blank=True, null=True)
 
     def __str__(self):
-        return self.notes + self.id
+        return self.notes

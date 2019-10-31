@@ -15,13 +15,13 @@ class FacebookBackend:
             return None
 
         user_id = res.json().get('data').get('user_id')
-        res = self.get(user_id,
-                                  access_token=token,
-                                  params={
-                                      'fields': 'first_name, last_name, email'
-                                  })
-
-        print(res.json())
+        res = self.get(
+            user_id,
+            access_token=token,
+            params={
+                'fields': 'first_name, last_name, email'
+            }
+        )
 
         if not (res.json().get('email') and res.json().get('first_name') and res.json().get('last_name')):
             return None
@@ -30,9 +30,11 @@ class FacebookBackend:
             user = User.objects.get(email=res.json().get('email'))
         except User.DoesNotExist:
             # Create a new user.
-            user = User(email=res.json().get('email'),
-                        first_name=res.json().get('first_name'),
-                        last_name=res.json().get('last_name'))
+            user = User(
+                email=res.json().get('email'),
+                first_name=res.json().get('first_name'),
+                last_name=res.json().get('last_name')
+            )
             user.save()
         return user
 
@@ -44,12 +46,15 @@ class FacebookBackend:
 
     def get_app_token(self):
         if self.APP_ACCESS_TOKEN is None:
-            res = self.get('oauth/access_token', access_token=None,
-                            params={
-                                'client_id': settings.FACEBOOK_APP_ID,
-                                'client_secret': settings.FACEBOOK_APP_SECRET,
-                                'grant_type': 'client_credentials'
-                            })
+            res = self.get(
+                'oauth/access_token',
+                access_token=None,
+                params={
+                    'client_id': settings.FACEBOOK_APP_ID,
+                    'client_secret': settings.FACEBOOK_APP_SECRET,
+                    'grant_type': 'client_credentials'
+                }
+            )
             self.APP_ACCESS_TOKEN = res.json()['access_token']
         return self.APP_ACCESS_TOKEN
 

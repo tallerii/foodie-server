@@ -1,12 +1,14 @@
-from rest_framework import viewsets
+from rest_framework import mixins, viewsets
 
 from foodie.orders.permissions import OrderPermissions
-from foodie.orders.serializers import OrderSerializer
+from foodie.orders.serializers import ListOrdersSerializer
 
 
-class OrderViewSet(viewsets.ModelViewSet):
+class OrderViewSet(mixins.CreateModelMixin,
+                   mixins.ListModelMixin,
+                   viewsets.GenericViewSet):
     permission_classes = [OrderPermissions]
-    serializer_class = OrderSerializer
+    serializer_class = ListOrdersSerializer
 
     def get_queryset(self):
         if self.request.user.is_delivery:
