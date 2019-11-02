@@ -1,8 +1,7 @@
-from rest_framework import serializers
-from rest_framework_gis.fields import GeometryField
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 from .models import Order
+
 
 class ListOrdersSerializer(GeoFeatureModelSerializer):
     class Meta:
