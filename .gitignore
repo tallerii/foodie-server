@@ -105,3 +105,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Firebase credentials
+foodie/firebase-key.json
