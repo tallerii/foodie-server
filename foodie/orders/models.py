@@ -20,8 +20,8 @@ class Order(models.Model):
     client_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders_made',
                                     limit_choices_to={'is_delivery': False})
     status = models.CharField(choices=POSSIBLE_STATUS, default=UNASSIGNED_STATUS, max_length=100)
-    delivered = models.BooleanField(default=False)
     date_time_ordered = models.DateTimeField(auto_now_add=True)
+    price = models.FloatField(blank=True, null=True)
     start_location = models.PointField(blank=True, null=True)
     end_location = models.PointField(blank=True, null=True)
     actual_location = models.PointField(blank=True, null=True)
