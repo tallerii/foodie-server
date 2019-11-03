@@ -5,7 +5,7 @@ from django.contrib.gis.db import models
 from foodie.users.models import User
 
 UNASSIGNED_STATUS = "unassigned"
-IN_PROGRESS_STATUS = "unassigned"
+IN_PROGRESS_STATUS = "in progress"
 DELIVERED_STATUS = "delivered"
 DELIVER_ERROR_STATUS = "deliver error"
 POSSIBLE_STATUS = [(UNASSIGNED_STATUS, UNASSIGNED_STATUS), (IN_PROGRESS_STATUS, IN_PROGRESS_STATUS),
@@ -22,7 +22,6 @@ class Order(models.Model):
     status = models.CharField(choices=POSSIBLE_STATUS, default=UNASSIGNED_STATUS, max_length=100)
     delivered = models.BooleanField(default=False)
     date_time_ordered = models.DateTimeField(auto_now_add=True)
-    price = models.FloatField(blank=True, null=True)
     start_location = models.PointField(blank=True, null=True)
     end_location = models.PointField(blank=True, null=True)
     actual_location = models.PointField(blank=True, null=True)
