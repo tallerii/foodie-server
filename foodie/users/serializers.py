@@ -12,7 +12,7 @@ class PrivateUserSerializer(GeoFeatureModelSerializer):
 
         fields = ('id', 'username', 'avatar', 'first_name', 'last_name', 'email',
                   'phone_number', 'is_premium', 'is_delivery', 'reputation',
-                  'location_last_updated')
+                  'location_last_updated', 'FCMToken')
         read_only_fields = ('username', 'is_premium', 'reputation', 'location_last_updated')
 
 
@@ -23,7 +23,7 @@ class PublicUserSerializer(GeoFeatureModelSerializer):
         geo_field = 'last_location'
 
         fields = ('id', 'username', 'avatar', 'first_name', 'last_name', 'is_premium',
-                  'is_delivery', 'reputation', 'location_last_updated')
+                  'is_delivery', 'reputation', 'location_last_updated', 'FCMToken')
 
 
 class CreateUserSerializer(GeoFeatureModelSerializer):
@@ -38,7 +38,7 @@ class CreateUserSerializer(GeoFeatureModelSerializer):
         model = User
         geo_field = 'last_location'
         fields = ('id', 'username', 'password', 'avatar', 'first_name', 'last_name', 'email',
-                  'phone_number')
+                  'phone_number', 'FCMToken')
         extra_kwargs = {'password': {'write_only': True}}
 
 
