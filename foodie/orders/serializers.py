@@ -1,11 +1,13 @@
-from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
-from rest_framework_gis.serializers import GeometryField
 
+from foodie.users.serializers import PublicUserSerializer
 from .models import Order
 
 
 class ListOrdersSerializer(GeoFeatureModelSerializer):
+    client_user = PublicUserSerializer(required=False)
+    delivery_user = PublicUserSerializer(required=False)
+
     class Meta:
         model = Order
         geo_field = 'actual_location'
@@ -17,6 +19,9 @@ class ListOrdersSerializer(GeoFeatureModelSerializer):
 
 
 class ActivateOrdersSerializer(GeoFeatureModelSerializer):
+    client_user = PublicUserSerializer(required=False)
+    delivery_user = PublicUserSerializer(required=False)
+
     class Meta:
         model = Order
         geo_field = 'actual_location'

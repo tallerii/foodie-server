@@ -7,9 +7,9 @@ from foodie.orders.serializers import ListOrdersSerializer, ActivateOrdersSerial
 
 from firebase_admin import messaging
 
+
 class OrderViewSet(mixins.CreateModelMixin,
-                   mixins.ListModelMixin,
-                   viewsets.GenericViewSet):
+                   viewsets.ReadOnlyModelViewSet):
     permission_classes = [OrderPermissions]
     serializer_class = ListOrdersSerializer
 
