@@ -4,6 +4,7 @@ services:
   - docker
 python:
   - '3.6'
+install: pip --version
 before_script:
   - docker-compose build
 script:

@@ -7,3 +7,5 @@ DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 # HTTPS
 SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+CORS_ORIGIN_ALLOW_ALL = True
