@@ -1,5 +1,6 @@
 from rest_framework import mixins, viewsets, status
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from foodie.orders.models import Order, UNASSIGNED_STATUS, IN_PROGRESS_STATUS, DELIVERED_STATUS
 from foodie.orders.serializers import ListOrdersSerializer, CreateOrderSerializer
@@ -8,6 +9,8 @@ from firebase_admin import messaging
 
 
 class OrderViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
+    permission_classes = (IsAuthenticated,)
+
     def get_serializer_class(self):
         if self.action == 'create':
             return CreateOrderSerializer
