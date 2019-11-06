@@ -6,11 +6,12 @@ from rest_framework import viewsets, mixins, status
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework_gis.filters import DistanceToPointFilter
+from rest_framework.decorators import action
 
 from .models import User
 from .permissions import UsersPermissions
-from .serializers import CreateUserSerializer, PrivateUserSerializer, PublicUserSerializer, PasswordSerializer, \
-    RecuperationTokenSerializer
+from .serializers import CreateUserSerializer, PrivateUserSerializer, PublicUserSerializer, PasswordResetSerializer, \
+    PasswordRecuperationSerializer
 
 from firebase_admin import db as firebaseDB
 
@@ -36,8 +37,10 @@ class UserViewSet(mixins.RetrieveModelMixin,
         if ((self.action == 'retrieve' or self.action == 'update' or self.action == 'partial_update') and \
            self.request.user == self.get_object()):
             return PrivateUserSerializer
-        if self.action == 'set_password':
-            return PasswordSerializer
+        if self.action == 'password_recovery':
+            return PasswordRecuperationSerializer
+        if self.action == 'password_reset':
+            return PasswordResetSerializer
         return PublicUserSerializer
 
     def create(self, request, is_delivery):
@@ -52,8 +55,8 @@ class UserViewSet(mixins.RetrieveModelMixin,
         serializer = self.get_serializer(user, data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        self.update_location_to_firebase(serializer.validated_data)
-        serializer.save(location_last_updated=datetime.now())
+        when = self.update_location_to_firebase(serializer.validated_data)
+        serializer.save(location_last_updated=when)
         return Response(serializer.data)
 
     def partial_update(self, request, *args, **kwargs):
@@ -62,8 +65,8 @@ class UserViewSet(mixins.RetrieveModelMixin,
         serializer.is_valid(raise_exception=True)
 
         if 'last_location' in serializer.validated_data:
-            self.update_location_to_firebase(serializer.validated_data)
-            serializer.save(location_last_updated=datetime.now())
+            when = self.update_location_to_firebase(serializer.validated_data)
+            serializer.save(location_last_updated=when)
         else:
             serializer.save()
         return Response(serializer.data)
@@ -71,17 +74,50 @@ class UserViewSet(mixins.RetrieveModelMixin,
     def update_location_to_firebase(self, validated_data):
         ref = firebaseDB.reference('users')
         users_ref = ref.child(str(self.get_object().id))
+        now = datetime.now()
         users_ref.set({
             'lat': validated_data.get('last_location').x,
-            'lon': validated_data.get('last_location').y
+            'lon': validated_data.get('last_location').y,
+            'when': now
         })
+        return now
 
+    @action(detail=False, methods=['post'])
+    def password_recovery(self, request):
+        serializer = PasswordRecuperationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data.get('user')
+        user.recuperation_token = secrets.token_urlsafe(14)
+        user.save()
+        send_mail(
+            'Foodie recovery token',
+            'Your recovery token is %s' % user.recuperation_token,
+            'foodie_helpdesk@sandbox3889059f07594dbb84189d1d99bbed1b.mailgun.org',
+            [user.email],
+            fail_silently=False,
+        )
+        return Response({'status': 'recovery token was send to %s' % user.email})
+
+    @action(detail=False, methods=['post'])
+    def password_reset(self, request):
+        serializer = PasswordResetSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data.get('user')
+        user.set_password(serializer.validated_data.get('password'))
+        user.save()
+        return Response({'status': 'new password set'})
 
 class DeliveryViewSet(UserViewSet):
     """
     Updates and retrieves deliveries
     """
     queryset = User.objects.filter(is_delivery=True)
+    """
+    The dist parameter is implicit:
+    /near_deliveries/?dist=radious&point=x,y&format=json
+    """
+    distance_filter_field = 'last_location'
+    filter_backends = (DistanceToPointFilter, )
 
     def create(self, request, *args, **kwargs):
         return super().create(request, is_delivery=True)
@@ -95,51 +131,3 @@ class ClientViewSet(UserViewSet):
 
     def create(self, request, *args, **kwargs):
         return super().create(request, is_delivery=False)
-
-
-class NearDeliveryList(ListAPIView, viewsets.GenericViewSet):
-    """
-    The dist parameter is implicit:
-    /near_deliveries/?dist=radious&point=x,y&format=json
-    """
-    permission_classes = (UsersPermissions,)
-    queryset = User.objects.filter(is_delivery=True)
-    serializer_class = PublicUserSerializer
-    distance_filter_field = 'last_location'
-    filter_backends = (DistanceToPointFilter, )
-
-
-class PasswordRecoveryViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    serializer_class = RecuperationTokenSerializer
-
-    def create(self, request, *args, **kwargs):
-        if "email" not in self.request.data:
-            return Response(data="email data is needed in json body", status=status.HTTP_400_BAD_REQUEST)
-
-        user = User.objects.get(email=self.request.data["email"])
-        recuperation_token = secrets.token_urlsafe(14)
-        user.recuperation_token = recuperation_token
-        user.save()
-        send_mail(
-            'Recovery token',
-            "Your recovery token is %s" % recuperation_token,
-            'foodie_helpdesk@sandbox3889059f07594dbb84189d1d99bbed1b.mailgun.org',
-            [user.email],
-            fail_silently=False,
-        )
-        return Response(data="Your recovery token was send to %s" % user.email, status=status.HTTP_200_OK)
-
-
-class PasswordResetViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    serializer_class = PasswordSerializer
-
-    def create(self, request, *args, **kwargs):
-        if ("token" not in self.request.data or "username" not in self.request.data
-                or "password" not in self.request.data):
-            return Response(data="token, username and password data is needed in json body",
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        user = User.objects.get(recuperation_token=self.request.data["token"], username=self.request.data["username"])
-        user.set_password(self.request.data["password"])
-        user.save()
-        return Response(data="Your new password was set correctly", status=status.HTTP_200_OK)

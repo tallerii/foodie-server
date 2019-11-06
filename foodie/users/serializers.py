@@ -42,14 +42,32 @@ class CreateUserSerializer(GeoFeatureModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
 
-class PasswordSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('password',)
-        extra_kwargs = {'password': {'write_only': True}}
+class PasswordResetSerializer(serializers.Serializer):
+    recuperation_token = serializers.CharField()
+    password = serializers.CharField()
+
+    def validate(self, attrs):
+        recuperation_token = attrs.get('recuperation_token')
+
+        try:
+            user = User.objects.get(recuperation_token=recuperation_token)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('Invalid recuperation token.')
+
+        attrs['user'] = user
+        return attrs
 
 
-class RecuperationTokenSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('recuperation_token', 'email')
+class PasswordRecuperationSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('User with the provided email does not exist.')
+
+        attrs['user'] = user
+        return attrs

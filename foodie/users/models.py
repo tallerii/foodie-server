@@ -16,14 +16,15 @@ phone_regex = RegexValidator(
 @python_2_unicode_compatible
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    avatar = models.ImageField(null=True)
-    phone_number = models.CharField(validators=[phone_regex], max_length=17, default=True)
+    email = models.EmailField(unique=True)
+    avatar = models.ImageField(blank=True, null=True)
+    phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)
     is_delivery = models.BooleanField(default=False)
     is_premium = models.BooleanField(default=False)
     reputation = models.FloatField(default=2.5)
-    last_location = models.PointField(default=None, null=True)
-    location_last_updated = models.DateTimeField(auto_now_add=True)
-    recuperation_token = models.CharField(max_length=30, null=True, default="")
+    last_location = models.PointField(blank=True, null=True)
+    location_last_updated = models.DateTimeField(blank=True, null=True)
+    recuperation_token = models.CharField(max_length=30, blank=True, null=True)
     FCMToken = models.CharField(max_length=300)
 
     def __str__(self):

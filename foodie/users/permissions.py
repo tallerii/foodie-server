@@ -6,7 +6,8 @@ class UsersPermissions(permissions.BasePermission):
     Object-level permission to only allow owners of an object to edit it.
     """
     def has_permission(self, request, view):
-        if view.action == 'create' or view.action == 'metadata':
+        if view.action == 'create' or view.action == 'metadata' or \
+           view.action == 'password_recovery' or view.action == 'password_reset':
             return True
 
         return request.user.is_authenticated

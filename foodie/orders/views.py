@@ -2,18 +2,29 @@ from rest_framework import mixins, viewsets, status
 from rest_framework.response import Response
 
 from foodie.orders.models import Order, UNASSIGNED_STATUS, IN_PROGRESS_STATUS, DELIVERED_STATUS
-from foodie.orders.permissions import OrderPermissions, UnassignedOrderPermissions
-from foodie.orders.serializers import ListOrdersSerializer, ActivateOrdersSerializer
+from foodie.orders.serializers import ListOrdersSerializer, CreateOrderSerializer
 
 from firebase_admin import messaging
 
 
-class OrderViewSet(mixins.CreateModelMixin,
-                   viewsets.ReadOnlyModelViewSet):
-    permission_classes = [OrderPermissions]
-    serializer_class = ListOrdersSerializer
+class OrderViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return CreateOrderSerializer
+        return ListOrdersSerializer
 
     def get_queryset(self):
+        status = self.request.query_params.get('status')
+
+        if status == UNASSIGNED_STATUS:
+            return Order.objects.filter(status=status)
+
+        if status == IN_PROGRESS_STATUS or status == DELIVERED_STATUS:
+            if self.request.user.is_delivery:
+                return self.request.user.delivered_orders.filter(status=status)
+            else:
+                return self.request.user.orders_made.filter(status=status)
+
         if self.request.user.is_delivery:
             return self.request.user.delivered_orders.all()
         else:
@@ -22,48 +33,30 @@ class OrderViewSet(mixins.CreateModelMixin,
     def perform_create(self, serializer):
         serializer.save(client_user=self.request.user)
 
-
-class DeliveredOrderViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = [OrderPermissions]
-    serializer_class = ActivateOrdersSerializer
-    queryset = Order.objects.filter(status=DELIVERED_STATUS)
-
-
-class ActiveOrderViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = [OrderPermissions]
-    serializer_class = ActivateOrdersSerializer
-    queryset = Order.objects.filter(status=IN_PROGRESS_STATUS)
-
     def update(self, request, *args, **kwargs):
         order = self.get_object()
-        serializer = self.get_serializer(order, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(delivery_user=self.request.user, status=DELIVERED_STATUS)
-        return Response(data=serializer.data, status=status.HTTP_200_OK)
+        if order.status == UNASSIGNED_STATUS:
+            newStatus = IN_PROGRESS_STATUS
+        elif order.status == IN_PROGRESS_STATUS or order.status == DELIVERED_STATUS:
+            newStatus = DELIVERED_STATUS
+        elif DELIVER_ERROR_STATUS:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+        order.status = newStatus
+        order.save()
+        notify_client(newStatus, order.client_user, order.delivery_user)
+        return Response(data=order, status=status.HTTP_200_OK)
 
-
-class UnassignedOrderViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = [UnassignedOrderPermissions]
-    serializer_class = ActivateOrdersSerializer
-    queryset = Order.objects.filter(status=UNASSIGNED_STATUS)
-
-    def update(self, request, *args, **kwargs):
-        order = self.get_object()
-        serializer = self.get_serializer(order, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-
-        serializer.save(delivery_user=self.request.user, status=IN_PROGRESS_STATUS)
+    def notify_client(self, newStatus, client, delivery):
         message = messaging.Message(
             data={
-                'status': 'in progress',
-                'delivery': str(self.request.user.id)
+                'status': newStatus,
+                'delivery': str(delivery.id)
             },
-            token=str(order.client_user.FCMToken),
+            token=str(client.FCMToken),
         )
         try:
             response = messaging.send(message)
         except:
             # TODO: handle message error
             print('Firebase messaging error')
-
-        return Response(data=serializer.data, status=status.HTTP_200_OK)

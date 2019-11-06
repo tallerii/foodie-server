@@ -5,9 +5,9 @@ from django.contrib.gis.db import models
 from foodie.users.models import User
 
 UNASSIGNED_STATUS = "unassigned"
-IN_PROGRESS_STATUS = "in progress"
+IN_PROGRESS_STATUS = "in_progress"
 DELIVERED_STATUS = "delivered"
-DELIVER_ERROR_STATUS = "deliver error"
+DELIVER_ERROR_STATUS = "deliver_error"
 POSSIBLE_STATUS = [(UNASSIGNED_STATUS, UNASSIGNED_STATUS), (IN_PROGRESS_STATUS, IN_PROGRESS_STATUS),
                    (DELIVERED_STATUS, DELIVERED_STATUS), (DELIVER_ERROR_STATUS, DELIVER_ERROR_STATUS)]
 
