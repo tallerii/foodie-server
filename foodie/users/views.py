@@ -110,19 +110,36 @@ class NearDeliveryList(ListAPIView, viewsets.GenericViewSet):
 
 
 class PasswordRecoveryViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    permission_classes = (UsersPermissions,)
     serializer_class = RecuperationTokenSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(self.request.user, data=self.request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
+        if "email" not in self.request.data:
+            return Response(data="email data is needed in json body", status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.get(email=self.request.data["email"])
         recuperation_token = secrets.token_urlsafe(14)
-        serializer.save(recuperation_token=recuperation_token)
+        user.recuperation_token = recuperation_token
+        user.save()
         send_mail(
             'Recovery token',
             "Your recovery token is %s" % recuperation_token,
             'foodie_helpdesk@sandbox3889059f07594dbb84189d1d99bbed1b.mailgun.org',
-            [self.request.user.email],
+            [user.email],
             fail_silently=False,
         )
-        return Response(data="Your recovery token was send to %s" % self.request.user.email, status=status.HTTP_200_OK)
+        return Response(data="Your recovery token was send to %s" % user.email, status=status.HTTP_200_OK)
+
+
+class PasswordResetViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    serializer_class = PasswordSerializer
+
+    def create(self, request, *args, **kwargs):
+        if ("token" not in self.request.data or "username" not in self.request.data
+                or "password" not in self.request.data):
+            return Response(data="token, username and password data is needed in json body",
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.get(recuperation_token=self.request.data["token"], username=self.request.data["username"])
+        user.set_password(self.request.data["password"])
+        user.save()
+        return Response(data="Your new password was set correctly", status=status.HTTP_200_OK)

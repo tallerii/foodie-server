@@ -52,4 +52,4 @@ class PasswordSerializer(serializers.ModelSerializer):
 class RecuperationTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('recuperation_token',)
+        fields = ('recuperation_token', 'email')
