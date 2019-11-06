@@ -4,7 +4,7 @@ from django.urls import path, include
 from rest_framework.authtoken import views
 from rest_framework.routers import DefaultRouter
 
-from foodie.orders.views import OrderViewSet, UnassignedOrderViewSet, ActiveOrderViewSet
+from foodie.orders.views import OrderViewSet, UnassignedOrderViewSet, ActiveOrderViewSet, DeliveredOrderViewSet
 from foodie.users.auth.views import FacebookAuthtoken
 from foodie.users.views import DeliveryViewSet, ClientViewSet, NearDeliveryList, PasswordRecoveryViewSet, \
     PasswordResetViewSet
@@ -12,6 +12,7 @@ from foodie.users.views import DeliveryViewSet, ClientViewSet, NearDeliveryList,
 router = DefaultRouter()
 router.register(r'orders/unassigned', UnassignedOrderViewSet, 'orders/unassigned')
 router.register(r'orders/active', ActiveOrderViewSet, 'orders/active')
+router.register(r'orders/delivered', DeliveredOrderViewSet, 'orders/delivered')
 router.register(r'orders', OrderViewSet, 'orders')
 router.register(r'clients', ClientViewSet, 'clients')
 router.register(r'deliveries', DeliveryViewSet, 'deliveries')

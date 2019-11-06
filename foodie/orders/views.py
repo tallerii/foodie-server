@@ -1,7 +1,7 @@
 from rest_framework import mixins, viewsets, status
 from rest_framework.response import Response
 
-from foodie.orders.models import Order, UNASSIGNED_STATUS, IN_PROGRESS_STATUS
+from foodie.orders.models import Order, UNASSIGNED_STATUS, IN_PROGRESS_STATUS, DELIVERED_STATUS
 from foodie.orders.permissions import OrderPermissions, UnassignedOrderPermissions
 from foodie.orders.serializers import ListOrdersSerializer, ActivateOrdersSerializer
 
@@ -23,10 +23,23 @@ class OrderViewSet(mixins.CreateModelMixin,
         serializer.save(client_user=self.request.user)
 
 
+class DeliveredOrderViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [OrderPermissions]
+    serializer_class = ActivateOrdersSerializer
+    queryset = Order.objects.filter(status=DELIVERED_STATUS)
+
+
 class ActiveOrderViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [OrderPermissions]
-    serializer_class = ListOrdersSerializer
+    serializer_class = ActivateOrdersSerializer
     queryset = Order.objects.filter(status=IN_PROGRESS_STATUS)
+
+    def update(self, request, *args, **kwargs):
+        order = self.get_object()
+        serializer = self.get_serializer(order, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(delivery_user=self.request.user, status=DELIVERED_STATUS)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class UnassignedOrderViewSet(viewsets.ReadOnlyModelViewSet):
