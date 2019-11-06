@@ -1,11 +1,10 @@
-from rest_framework import mixins, viewsets, status
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-
-from foodie.orders.models import Order, UNASSIGNED_STATUS, IN_PROGRESS_STATUS, DELIVERED_STATUS
-from foodie.orders.serializers import ListOrdersSerializer, CreateOrderSerializer
-
 from firebase_admin import messaging
+from rest_framework import mixins, viewsets, status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+from foodie.orders.models import Order, UNASSIGNED_STATUS, IN_PROGRESS_STATUS, DELIVERED_STATUS, DELIVER_ERROR_STATUS
+from foodie.orders.serializers import ListOrdersSerializer, CreateOrderSerializer
 
 
 class OrderViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
@@ -47,7 +46,7 @@ class OrderViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         
         order.status = newStatus
         order.save()
-        notify_client(newStatus, order.client_user, order.delivery_user)
+        self.notify_client(newStatus, order.client_user, order.delivery_user)
         return Response(data=order, status=status.HTTP_200_OK)
 
     def notify_client(self, newStatus, client, delivery):
