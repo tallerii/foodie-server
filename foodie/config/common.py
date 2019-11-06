@@ -1,10 +1,13 @@
 import os
-from os.path import join
 from distutils.util import strtobool
-import dj_database_url
+from os.path import join
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+EMAIL_HOST = 'smtp.mailgun.org'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'postmaster@sandbox3889059f07594dbb84189d1d99bbed1b.mailgun.org'
+EMAIL_USE_TLS = True
 
 INSTALLED_APPS = (
     'django.contrib.auth',

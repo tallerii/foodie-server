@@ -1,5 +1,7 @@
+import secrets
 from datetime import datetime
 
+from django.core.mail import send_mail
 from rest_framework import viewsets, mixins, status
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
@@ -7,7 +9,8 @@ from rest_framework_gis.filters import DistanceToPointFilter
 
 from .models import User
 from .permissions import UsersPermissions
-from .serializers import CreateUserSerializer, PrivateUserSerializer, PublicUserSerializer, PasswordSerializer
+from .serializers import CreateUserSerializer, PrivateUserSerializer, PublicUserSerializer, PasswordSerializer, \
+    RecuperationTokenSerializer
 
 from firebase_admin import db as firebaseDB
 
@@ -99,7 +102,27 @@ class NearDeliveryList(ListAPIView, viewsets.GenericViewSet):
     The dist parameter is implicit:
     /near_deliveries/?dist=radious&point=x,y&format=json
     """
+    permission_classes = (UsersPermissions,)
     queryset = User.objects.filter(is_delivery=True)
     serializer_class = PublicUserSerializer
     distance_filter_field = 'last_location'
     filter_backends = (DistanceToPointFilter, )
+
+
+class PasswordRecoveryViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    permission_classes = (UsersPermissions,)
+    serializer_class = RecuperationTokenSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.request.user, data=self.request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        recuperation_token = secrets.token_urlsafe(14)
+        serializer.save(recuperation_token=recuperation_token)
+        send_mail(
+            'Recovery token',
+            "Your recovery token is %s" % recuperation_token,
+            'foodie_helpdesk@sandbox3889059f07594dbb84189d1d99bbed1b.mailgun.org',
+            [self.request.user.email],
+            fail_silently=False,
+        )
+        return Response(data="Your recovery token was send to %s" % self.request.user.email, status=status.HTTP_200_OK)

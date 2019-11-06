@@ -23,6 +23,7 @@ class User(AbstractUser):
     reputation = models.FloatField(default=2.5)
     last_location = models.PointField(default=None, null=True)
     location_last_updated = models.DateTimeField(auto_now_add=True)
+    recuperation_token = models.CharField(max_length=30, null=True, default="")
     FCMToken = models.CharField(max_length=300)
 
     def __str__(self):

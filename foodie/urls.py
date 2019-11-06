@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 
 from foodie.orders.views import OrderViewSet, UnassignedOrderViewSet, ActiveOrderViewSet
 from foodie.users.auth.views import FacebookAuthtoken
-from foodie.users.views import DeliveryViewSet, ClientViewSet, NearDeliveryList
+from foodie.users.views import DeliveryViewSet, ClientViewSet, NearDeliveryList, PasswordRecoveryViewSet
 
 router = DefaultRouter()
 router.register(r'orders/unassigned', UnassignedOrderViewSet, 'orders/unassigned')
@@ -14,6 +14,7 @@ router.register(r'orders/active', ActiveOrderViewSet, 'orders/active')
 router.register(r'orders', OrderViewSet, 'orders')
 router.register(r'clients', ClientViewSet, 'clients')
 router.register(r'deliveries', DeliveryViewSet, 'deliveries')
+router.register(r'password_recovery', PasswordRecoveryViewSet, 'password_recovery')
 router.register(r'near_deliveries', NearDeliveryList, 'near_deliveries')
 
 urlpatterns = [

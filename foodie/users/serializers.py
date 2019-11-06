@@ -47,3 +47,9 @@ class PasswordSerializer(serializers.ModelSerializer):
         model = User
         fields = ('password',)
         extra_kwargs = {'password': {'write_only': True}}
+
+
+class RecuperationTokenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('recuperation_token',)
