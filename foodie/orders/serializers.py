@@ -12,7 +12,7 @@ class ListOrdersSerializer(GeoFeatureModelSerializer):
         model = Order
         geo_field = 'actual_location'
 
-        fields = ('id', 'notes', 'delivery_user', 'client_user', 'date_time_ordered',
+        fields = ('id', 'notes', 'delivery_user', 'client_user', 'date_time_ordered', 'delivery_price',
                   'price', 'start_location', 'end_location', 'actual_location', 'status')
 
 

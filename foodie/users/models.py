@@ -26,6 +26,7 @@ class User(AbstractUser):
     location_last_updated = models.DateTimeField(blank=True, null=True)
     recuperation_token = models.CharField(max_length=30, blank=True, null=True)
     FCMToken = models.CharField(max_length=300)
+    balance = models.FloatField(default=0)
 
     def __str__(self):
         return self.username

@@ -10,10 +10,10 @@ class PrivateUserSerializer(GeoFeatureModelSerializer):
         model = User
         geo_field = 'last_location'
 
-        fields = ('id', 'username', 'avatar', 'first_name', 'last_name', 'email',
+        fields = ('id', 'username', 'avatar', 'first_name', 'last_name', 'email', 'balance',
                   'phone_number', 'is_premium', 'is_delivery', 'reputation',
                   'location_last_updated', 'FCMToken')
-        read_only_fields = ('username', 'is_premium', 'reputation', 'location_last_updated')
+        read_only_fields = ('username', 'is_premium', 'reputation', 'balance', 'location_last_updated')
 
 
 class PublicUserSerializer(GeoFeatureModelSerializer):
