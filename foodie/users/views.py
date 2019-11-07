@@ -2,18 +2,17 @@ import secrets
 from datetime import datetime
 
 from django.core.mail import send_mail
+from firebase_admin import db as firebaseDB
 from rest_framework import viewsets, mixins, status
-from rest_framework.generics import ListAPIView
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_gis.filters import DistanceToPointFilter
-from rest_framework.decorators import action
 
+from foodie.orders.models import Order, DELIVERED_STATUS, DELIVER_ERROR_STATUS
 from .models import User
 from .permissions import UsersPermissions
 from .serializers import CreateUserSerializer, PrivateUserSerializer, PublicUserSerializer, PasswordResetSerializer, \
     PasswordRecuperationSerializer, PaymentSerializer
-
-from firebase_admin import db as firebaseDB
 
 
 class UserViewSet(mixins.RetrieveModelMixin,
@@ -144,3 +143,13 @@ class ClientViewSet(UserViewSet):
 
     def create(self, request, *args, **kwargs):
         return super().create(request, is_delivery=False)
+
+
+class StatsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    """
+    Get application stats
+    """
+    def list(self, request, *args, **kwargs):
+        return Response({'users': User.objects.count(),
+                         'orders_delivered': Order.objects.filter(status=DELIVERED_STATUS).count(),
+                         'orders_failed': Order.objects.filter(status=DELIVER_ERROR_STATUS).count()})
