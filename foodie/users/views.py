@@ -11,7 +11,7 @@ from rest_framework.decorators import action
 from .models import User
 from .permissions import UsersPermissions
 from .serializers import CreateUserSerializer, PrivateUserSerializer, PublicUserSerializer, PasswordResetSerializer, \
-    PasswordRecuperationSerializer
+    PasswordRecuperationSerializer, PaymentSerializer
 
 from firebase_admin import db as firebaseDB
 
@@ -41,6 +41,10 @@ class UserViewSet(mixins.RetrieveModelMixin,
             return PasswordRecuperationSerializer
         if self.action == 'password_reset':
             return PasswordResetSerializer
+        # TODO: create admin users and uncomment the following line
+        #if (self.action == 'payment' and self.request.user.is_admin):
+        if self.action == 'payment':
+            return PaymentSerializer
         return PublicUserSerializer
 
     def create(self, request, is_delivery):
@@ -106,6 +110,15 @@ class UserViewSet(mixins.RetrieveModelMixin,
         user.set_password(serializer.validated_data.get('password'))
         user.save()
         return Response({'status': 'new password set'})
+
+    @action(detail=False, methods=['post'])
+    def payment(self, request):
+        serializer = PaymentSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data.get('user')
+        user.balance -= serializer.validated_data.get('payment')
+        user.save()
+        return Response({'status': 'payment received'})
 
 class DeliveryViewSet(UserViewSet):
     """

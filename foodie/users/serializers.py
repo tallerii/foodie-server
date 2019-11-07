@@ -71,3 +71,19 @@ class PasswordRecuperationSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+
+class PaymentSerializer(serializers.Serializer):
+    pk = serializers.UUIDField()
+    payment = serializers.FloatField()
+
+    def validate(self, attrs):
+        pk = attrs.get('pk')
+
+        try:
+            user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('User with the provided id does not exist.')
+
+        attrs['user'] = user
+        return attrs
