@@ -21,12 +21,19 @@ class User(AbstractUser):
     phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)
     is_delivery = models.BooleanField(default=False)
     is_premium = models.BooleanField(default=False)
-    reputation = models.FloatField(default=2.5)
     last_location = models.PointField(blank=True, null=True)
     location_last_updated = models.DateTimeField(blank=True, null=True)
     recuperation_token = models.CharField(max_length=30, blank=True, null=True)
     FCMToken = models.CharField(max_length=300)
     balance = models.FloatField(default=0)
+
+    @property
+    def reputation(self):
+        if self.reviews.count() == 0:
+            return 2.5
+
+        values = [review.value for review in self.reviews.all()]
+        return sum(values) / len(values)
 
     def __str__(self):
         return self.username
