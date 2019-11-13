@@ -2,7 +2,7 @@ import random
 
 from django.db.models import Q
 from firebase_admin import messaging
-from rest_framework import mixins, viewsets, status
+from rest_framework import mixins, viewsets, status, serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -18,6 +18,8 @@ class OrderViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
     def get_serializer_class(self):
         if self.action == 'create':
             return CreateOrderSerializer
+        if self.action == 'update':
+            return serializers.Serializer
         return ListOrdersSerializer
 
     def get_queryset(self):
@@ -44,13 +46,17 @@ class OrderViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         order = self.get_object()
         new_status = order.status
         if order.status == UNASSIGNED_STATUS:
+            if not request.user.is_delivery:
+                return Response(
+                    {'error': 'only a delivery user can self-assign an order'},
+                    status=status.HTTP_400_BAD_REQUEST)
             new_status = IN_PROGRESS_STATUS
             order.delivery_price = round(random.uniform(10, 100), 2)
-            order.delivery_user = self.request.user
+            order.delivery_user = request.user
         elif order.status == IN_PROGRESS_STATUS:
             new_status = DELIVERED_STATUS
             order.delivery_user.balance += DELIVERY_PERCENTAGE_FEE * order.delivery_price
-            order.delivery_user.save()
+            order.delivery_user.save()      
         elif order.status == DELIVER_ERROR_STATUS:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         

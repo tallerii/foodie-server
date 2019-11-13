@@ -15,7 +15,6 @@ class ListOrdersSerializer(GeoFeatureModelSerializer):
         fields = ('id', 'notes', 'delivery_user', 'client_user', 'date_time_ordered', 'delivery_price',
                   'price', 'start_location', 'end_location', 'actual_location', 'status')
 
-
 class CreateOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order

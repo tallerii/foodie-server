@@ -81,7 +81,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
         users_ref.set({
             'lat': validated_data.get('last_location').x,
             'lon': validated_data.get('last_location').y,
-            'when': now
+            'when': now.timestamp()
         })
         return now
 
