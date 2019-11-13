@@ -15,3 +15,6 @@ class Review(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='reviews',
                               limit_choices_to=Q(status=DELIVERED_STATUS) | Q(status=DELIVER_ERROR_STATUS))
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
+
+    def __str__(self):
+        return str(self.notes)

@@ -36,7 +36,7 @@ class User(AbstractUser):
         return sum(values) / len(values)
 
     def __str__(self):
-        return self.username
+        return str(self.username)
 
     class Meta:
         ordering = ['date_joined']

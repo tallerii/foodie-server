@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from foodie.orders.serializers import ListOrdersSerializer
 from foodie.users.serializers import PublicUserSerializer
-from .models import Order, Review
+from foodie.reputation.models import Review
 
 
 class ListReviewSerializer(serializers.ModelSerializer):
@@ -13,7 +13,7 @@ class ListReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ('id', 'notes', 'value', 'order', 'user')
-        read_only = ('id', 'order', 'user')
+        read_only_fields = ('id', 'order', 'user')
 
 
 class CreateReviewSerializer(serializers.ModelSerializer):

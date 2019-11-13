@@ -28,4 +28,4 @@ class Order(models.Model):
     actual_location = models.PointField(blank=True, null=True)
 
     def __str__(self):
-        return self.notes
+        return str(self.notes)
