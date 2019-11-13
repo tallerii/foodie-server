@@ -139,7 +139,7 @@ class TestClientDetailTestCase(APITestCase):
         create_self_response = self.client.post(reverse('clients-list'), self.self_data)
         create_other_response = self.client.post(reverse('clients-list'), self.other_data)
         self_credentials = {'username': self.self_data.get('username'), 'password': self.self_data.get('password')}
-        auth_token_response = self.client.post('/token-auth/username/', self_credentials)
+        auth_token_response = self.client.post('/token-auth/username', self_credentials)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {auth_token_response.data.get("token")}')
         self_id = create_self_response.data.get('id')
         other_id = create_other_response.data.get('id')
