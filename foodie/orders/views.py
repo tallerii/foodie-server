@@ -63,7 +63,7 @@ class OrderViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         order.status = new_status
         order.save()
         self.notify_client(new_status, order.client_user, order.delivery_user)
-        return Response(data=order, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK)
 
     def notify_client(self, new_status, client, delivery):
         message = messaging.Message(
