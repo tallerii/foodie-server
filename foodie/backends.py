@@ -5,7 +5,7 @@ from django.conf import settings
 class FacebookBackend:
     APP_ACCESS_TOKEN = None
 
-    def authenticate(self, request, token=None):
+    def authenticate(self, request, token, FCMToken):
         app_token = self.get_app_token()
         res = self.get('debug_token', access_token=app_token, params={'input_token': token})
 
@@ -33,7 +33,8 @@ class FacebookBackend:
             user = User(
                 email=res.json().get('email'),
                 first_name=res.json().get('first_name'),
-                last_name=res.json().get('last_name')
+                last_name=res.json().get('last_name'),
+                FCMToken=FCMToken
             )
             user.save()
         return user
