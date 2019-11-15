@@ -32,6 +32,7 @@ class FacebookBackend:
             # Create a new user.
             user = User(
                 email=res.json().get('email'),
+                username=res.json().get('email'),
                 first_name=res.json().get('first_name'),
                 last_name=res.json().get('last_name'),
                 FCMToken=FCMToken
