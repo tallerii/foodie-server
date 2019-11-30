@@ -7,12 +7,13 @@ from rest_framework.routers import DefaultRouter
 from foodie.orders.views import OrderViewSet
 from foodie.reputation.views import ReviewViewSet
 from foodie.users.auth.views import FacebookAuthtoken
-from foodie.users.views import DeliveryViewSet, ClientViewSet, StatsViewSet
+from foodie.users.views import DeliveryViewSet, ClientViewSet, StatsViewSet, StaffViewSet
 
 router = DefaultRouter(trailing_slash=False)
 router.register(r'orders', OrderViewSet, 'orders')
 router.register(r'clients', ClientViewSet, 'clients')
 router.register(r'deliveries', DeliveryViewSet, 'deliveries')
+router.register(r'staffs', StaffViewSet, 'staffs')
 router.register(r'stats', StatsViewSet, 'stats')
 router.register(r'review', ReviewViewSet, 'review')
 

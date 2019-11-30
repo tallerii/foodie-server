@@ -46,11 +46,11 @@ class UserViewSet(mixins.RetrieveModelMixin,
             return PaymentSerializer
         return PublicUserSerializer
 
-    def create(self, request, is_delivery):
+    def create(self, request, is_delivery=False, is_staff=False):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        serializer.save(is_delivery=is_delivery)
+        serializer.save(is_delivery=is_delivery, is_staff=is_staff)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
@@ -126,7 +126,7 @@ class DeliveryViewSet(UserViewSet):
     """
     Updates and retrieves deliveries
     """
-    queryset = User.objects.filter(is_delivery=True)
+    queryset = User.objects.filter(is_delivery=True, is_staff=False)
     """
     The dist parameter is implicit:
     /near_deliveries/?dist=radious&point=x,y&format=json
@@ -142,10 +142,19 @@ class ClientViewSet(UserViewSet):
     """
     Updates and retrieves clients
     """
-    queryset = User.objects.filter(is_delivery=False)
+    queryset = User.objects.filter(is_delivery=False, is_staff=False)
 
     def create(self, request, *args, **kwargs):
         return super().create(request, is_delivery=False)
+
+class StaffViewSet(UserViewSet):
+    """
+    Updates and retrieves staff
+    """
+    queryset = User.objects.filter(is_staff=True)
+
+    def create(self, request, *args, **kwargs):
+        return super().create(request, is_staff=True)
 
 
 class StatsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):

@@ -24,6 +24,9 @@ class OrderViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         return ListOrdersSerializer
 
     def get_queryset(self):
+        if self.request.user.is_staff:
+            return Object.objects.all()
+
         status = self.request.query_params.get('status')
 
         if status == UNASSIGNED_STATUS:
