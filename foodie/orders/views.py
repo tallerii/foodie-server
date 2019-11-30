@@ -1,7 +1,7 @@
 import random
 
 from django.db.models import Q
-from firebase_admin import messaging
+from firebase_admin import messaging, exceptions
 from rest_framework import mixins, viewsets, status, serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -31,8 +31,7 @@ class OrderViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         if status == IN_PROGRESS_STATUS or status == DELIVERED_STATUS:
             if self.request.user.is_delivery:
                 return self.request.user.delivered_orders.filter(status=status)
-            else:
-                return self.request.user.orders_made.filter(status=status)
+            return self.request.user.orders_made.filter(status=status)
 
         if self.request.user.is_delivery:
             return Order.objects.filter(Q(delivery_user=self.request.user) | Q(status=UNASSIGNED_STATUS))
@@ -68,13 +67,12 @@ class OrderViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
     def notify_client(self, new_status, client, delivery):
         message = messaging.Message(
             data={
-                'status': new_status,
+                'status': str(new_status),
                 'delivery': str(delivery.id)
             },
             token=str(client.FCMToken),
         )
         try:
             response = messaging.send(message)
-        except:
-            # TODO: handle message error
-            print('Firebase messaging error')
+        except exceptions.FirebaseError as e:
+            print('Firebase messaging error: ' + str(e))
