@@ -79,6 +79,7 @@ class OrderViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
                     'delivery': str(delivery.id)
                 }
             ),
+            token=str(client.FCMToken),	
         )
         # [END android_message]
         try:
