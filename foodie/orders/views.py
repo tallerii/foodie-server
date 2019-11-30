@@ -65,14 +65,26 @@ class OrderViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         return Response(status=status.HTTP_200_OK)
 
     def notify_client(self, new_status, client, delivery):
+    # [START android_message]
         message = messaging.Message(
-            data={
-                'status': str(new_status),
-                'delivery': str(delivery.id)
-            },
-            token=str(client.FCMToken),
+            android=messaging.AndroidConfig(
+                ttl=datetime.timedelta(seconds=3600),
+                priority='normal',
+                notification=messaging.AndroidNotification(
+                    title='Cambio de estado',
+                    body=str(new_status)
+                ),
+                data={
+                    'status': str(new_status),
+                    'delivery': str(delivery.id)
+                }
+            ),
+            token=str(client.FCMToken),	
         )
+        # [END android_message]
         try:
             response = messaging.send(message)
         except exceptions.FirebaseError as e:
             print('Firebase messaging error: ' + str(e))
+
+
