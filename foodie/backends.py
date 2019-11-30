@@ -37,6 +37,9 @@ class FacebookBackend:
                 last_name=res.json().get('last_name'),
                 FCMToken=FCMToken
             )
+        else:
+            user.FCMToken = FCMToken
+        finally:
             user.save()
         return user
 
