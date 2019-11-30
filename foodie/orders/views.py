@@ -76,3 +76,5 @@ class OrderViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
             response = messaging.send(message)
         except exceptions.FirebaseError as e:
             print('Firebase messaging error: ' + str(e))
+        else:
+            print(str(response))
