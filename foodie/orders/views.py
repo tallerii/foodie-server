@@ -1,4 +1,5 @@
 import random
+from datetime import timedelta
 
 from django.db.models import Q
 from firebase_admin import messaging, exceptions
@@ -68,7 +69,7 @@ class OrderViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         # [START android_message]
         message = messaging.Message(
             android=messaging.AndroidConfig(
-                ttl=datetime.timedelta(seconds=3600),
+                ttl=timedelta(seconds=3600),
                 priority='normal',
                 notification=messaging.AndroidNotification(
                     title='Cambio de estado',
