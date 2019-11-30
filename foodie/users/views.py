@@ -58,8 +58,11 @@ class UserViewSet(mixins.RetrieveModelMixin,
         serializer = self.get_serializer(user, data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        when = self.update_location_to_firebase(serializer.validated_data)
-        serializer.save(location_last_updated=when)
+        if serializer.validated_data.get('last_location') is not None:
+            when = self.update_location_to_firebase(serializer.validated_data)
+            serializer.save(location_last_updated=when)
+        else:
+            serializer.save()
         return Response(serializer.data)
 
     def partial_update(self, request, *args, **kwargs):
@@ -67,7 +70,7 @@ class UserViewSet(mixins.RetrieveModelMixin,
         serializer = self.get_serializer(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
 
-        if 'last_location' in serializer.validated_data:
+        if serializer.validated_data.get('last_location') is not None:
             when = self.update_location_to_firebase(serializer.validated_data)
             serializer.save(location_last_updated=when)
         else:
@@ -79,9 +82,9 @@ class UserViewSet(mixins.RetrieveModelMixin,
         users_ref = ref.child(str(self.get_object().id))
         now = datetime.now()
         users_ref.set({
-            'lat': validated_data.get('last_location').x,
-            'lon': validated_data.get('last_location').y,
-            'when': now.timestamp()
+            'lat': str(validated_data.get('last_location').x),
+            'lon': str(validated_data.get('last_location').y),
+            'when': str(now.timestamp())
         })
         return now
 
