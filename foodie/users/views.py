@@ -82,9 +82,9 @@ class UserViewSet(mixins.RetrieveModelMixin,
         users_ref = ref.child(str(self.get_object().id))
         now = datetime.now()
         users_ref.set({
-            'lat': str(validated_data.get('last_location').x),
-            'lon': str(validated_data.get('last_location').y),
-            'when': str(now.timestamp())
+            'lat': validated_data.get('last_location').x,
+            'lon': validated_data.get('last_location').y,
+            'when': now.timestamp()
         })
         return now
 
