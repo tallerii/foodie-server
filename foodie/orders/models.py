@@ -24,8 +24,9 @@ class Order(models.Model):
     price = models.FloatField(blank=True, null=True)
     delivery_price = models.FloatField(blank=True, null=True)
     start_location = models.PointField(blank=True, null=True)
+    start_address = models.TextField(blank=True, null=True)
     end_location = models.PointField(blank=True, null=True)
-    actual_location = models.PointField(blank=True, null=True)
+    end_address = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return str(self.notes)
