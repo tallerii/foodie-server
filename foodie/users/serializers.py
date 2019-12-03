@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
 from .models import User
@@ -87,3 +88,11 @@ class PaymentSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+
+class BalanceSerializer(ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('id', 'balance')
+        read_only_fields = ('id', 'balance')

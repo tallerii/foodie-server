@@ -12,7 +12,7 @@ from foodie.orders.models import Order, DELIVERED_STATUS, DELIVER_ERROR_STATUS
 from .models import User
 from .permissions import UsersPermissions
 from .serializers import CreateUserSerializer, PrivateUserSerializer, PublicUserSerializer, PasswordResetSerializer, \
-    PasswordRecuperationSerializer, PaymentSerializer
+    PasswordRecuperationSerializer, PaymentSerializer, BalanceSerializer
 
 
 class UserViewSet(mixins.RetrieveModelMixin,
@@ -44,6 +44,8 @@ class UserViewSet(mixins.RetrieveModelMixin,
         #if (self.action == 'payment' and self.request.user.is_admin):
         if self.action == 'payment':
             return PaymentSerializer
+        if self.action == 'balance':
+            return BalanceSerializer
         return PublicUserSerializer
 
     def create(self, request, is_delivery=False, is_staff=False):
@@ -121,6 +123,14 @@ class UserViewSet(mixins.RetrieveModelMixin,
         user.balance -= serializer.validated_data.get('payment')
         user.save()
         return Response({'status': 'payment received'})
+
+    @action(detail=True)
+    def balance(self, request, *args, **kwargs):
+        user = self.get_object()
+        serializer = self.get_serializer(user, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data)
+
 
 class DeliveryViewSet(UserViewSet):
     """
