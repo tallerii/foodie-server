@@ -1,14 +1,18 @@
-from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from rest_framework import serializers
 
-from foodie.orders.serializers import ListOrdersSerializer
-from foodie.users.serializers import PublicUserSerializer
 from foodie.reputation.models import Review
+from foodie.users.serializers import PublicUserSerializer
+
+
+class ShowReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ('id', 'notes', 'value', 'user')
+        read_only_fields = ('id', 'notes', 'value', 'user')
 
 
 class ListReviewSerializer(serializers.ModelSerializer):
     user = PublicUserSerializer()
-    order = ListOrdersSerializer()
 
     class Meta:
         model = Review
