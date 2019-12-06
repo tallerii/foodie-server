@@ -2,11 +2,6 @@
 
 [![Build Status](https://travis-ci.org/tallerii/foodie-server.svg?branch=master)](https://travis-ci.org/tallerii/foodie-server)
 [![Coverage Status](https://coveralls.io/repos/github/tallerii/foodie-server/badge.svg?branch=master)](https://coveralls.io/github/tallerii/foodie-server?branch=master)
-# Prerequisites
-
-- [Docker](https://docs.docker.com/docker-for-mac/install/)  
-- [Travis CLI](http://blog.travis-ci.com/2013-01-14-new-client/)
-- [Heroku Toolbelt](https://toolbelt.heroku.com/)
 
 # Local Development
 
@@ -21,52 +16,12 @@ Run a command inside the docker container:
 docker-compose run --rm web [command]
 ```
 
-# Continuous Deployment
+# Estructura de la aplicacion
 
-Deployment is automated via Travis. When builds pass on the master or qa branch, Travis will deploy that branch to Heroku. Follow these steps to enable this feature.
+La aplicacion esta dividida en tres grandes modulos:
 
-Initialize the production server:
+- **foodie.users**: Contiene toda la logica de usuarios, incluyendo los tres tipos de usuario: staff, cliente y delivery.
 
-```
-heroku create foodie-prod --remote prod && \
-    heroku addons:create newrelic:wayne --app foodie-prod && \
-    heroku addons:create heroku-postgresql:hobby-dev --app foodie-prod && \
-    heroku config:set DJANGO_SECRET_KEY=`openssl rand -base64 32` \
-        DJANGO_AWS_ACCESS_KEY_ID="Add your id" \
-        DJANGO_AWS_SECRET_ACCESS_KEY="Add your key" \
-        DJANGO_AWS_STORAGE_BUCKET_NAME="foodie-prod" \
-        DJANGO_CONFIGURATION="Production" \
-        DJANGO_SETTINGS_MODULE="foodie.config" \
-        --app foodie-prod
-```
+- **foodie.orders**: Contiene toda la logica para realizar y asignar pedidos.
 
-Initialize the qa server:
-
-```
-heroku create foodie-qa --remote qa && \
-    heroku addons:create newrelic:wayne --app foodie-qa && \
-    heroku addons:create heroku-postgresql:hobby-dev --app foodie-qa && \
-    heroku config:set DJANGO_SECRET_KEY=`openssl rand -base64 32` \
-        DJANGO_AWS_ACCESS_KEY_ID="Add your id" \
-        DJANGO_AWS_SECRET_ACCESS_KEY="Add your key" \
-        DJANGO_AWS_STORAGE_BUCKET_NAME="foodie-qa" \
-        DJANGO_CONFIGURATION="Production" \
-        DJANGO_SETTINGS_MODULE="foodie.config" \
-        --app foodie-qa
-```
-
-Securely add your Heroku credentials to Travis so that it can automatically deploy your changes:
-
-```bash
-travis encrypt HEROKU_AUTH_TOKEN="$(heroku auth:token)" --add
-```
-
-Commit your changes and push to master and qa to trigger your first deploys:
-
-```bash
-git commit -a -m "ci(travis): add Heroku credentials" && \
-git push origin master:qa && \
-git push origin master
-```
-
-You're now ready to continuously ship! ✨ 💅 🛳
+- **foodie.reputation**: Contiene la logica para realizar reviews de los pedidos ya realizados.
