@@ -1,6 +1,7 @@
-import random
+import json
 from datetime import timedelta
 
+from business_rules import run_all
 from django.db.models import Q
 from firebase_admin import messaging, exceptions
 from rest_framework import mixins, viewsets, status, serializers
@@ -8,9 +9,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from foodie.orders.models import Order, UNASSIGNED_STATUS, IN_PROGRESS_STATUS, DELIVERED_STATUS, DELIVER_ERROR_STATUS
+from foodie.orders.price_rules import BASE_PRICE, OrderVariables, OrderActions
 from foodie.orders.serializers import ListOrdersSerializer, CreateOrderSerializer
 
 DELIVERY_PERCENTAGE_FEE = 0.85
+
+
+with open('business_rules.json') as json_file:
+    rules = json.load(json_file)
 
 
 class OrderViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
@@ -54,7 +60,11 @@ class OrderViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
                     {'error': 'only a delivery user can self-assign an order'},
                     status=status.HTTP_400_BAD_REQUEST)
             new_status = IN_PROGRESS_STATUS
-            order.delivery_price = round(random.uniform(10, 100), 2)
+            order.delivery_price = BASE_PRICE
+            run_all(rule_list=rules,
+                    defined_variables=OrderVariables(order),
+                    defined_actions=OrderActions(order)
+                    )
             order.delivery_user = request.user
         elif order.status == IN_PROGRESS_STATUS:
             new_status = DELIVERED_STATUS

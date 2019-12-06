@@ -1,0 +1,124 @@
+[
+    {"conditions": {"all": [
+        {"name": "distance",
+         "operator": "greater_than",
+         "value": 2000
+         }
+    ]},
+        "actions": [
+            {"name": "extra_kms",
+             "params": {"km_price": 15}
+             }
+        ]
+    },
+    {"conditions": {"all": [
+        {"name": "weekday",
+         "operator": "equal_to",
+         "value": 2
+         },
+        {"name": "hour",
+         "operator": "equal_to",
+         "value": 15
+         }
+    ]},
+        "actions": [
+            {"name": "discount_porc",
+             "params": {"porc": 0.05}
+             }
+        ]
+    },
+    {"conditions": {"all": [
+        {"name": "n_orders",
+         "operator": "equal_to",
+         "value": 0
+         }
+    ]},
+        "actions": [
+            {"name": "discount_fixed",
+             "params": {"disc": 100}
+             }
+        ]
+    },
+    {"conditions": {"all": [
+        {"name": "weekday",
+         "operator": "less_than",
+         "value": 5
+         },
+        {"name": "hour",
+         "operator": "greater_than_or_equal_to",
+         "value": 17
+         },
+        {"name": "hour",
+         "operator": "less_than",
+         "value": 19
+         }
+    ]},
+        "actions": [
+            {"name": "recharge_porc",
+             "params": {"porc": 0.1}
+             }
+        ]
+    },
+    {"conditions": {"all": [
+        {"name": "n_orders",
+         "operator": "greater_than",
+         "value": 5
+         }
+    ]},
+        "actions": [
+            {"name": "discount_porc",
+             "params": {"porc": 0.05}
+             }
+        ]
+    },
+    {"conditions": {"all": [
+        {"name": "client_is_premium",
+         "operator": "is_true",
+         "value": true
+         },
+        {"name": "n_orders_this_month",
+         "operator": "less_than",
+         "value": 6
+         }
+    ]},
+        "actions": [
+            {"name": "free_order"}
+        ]
+    },
+    {"conditions": {"all": [
+        {"name": "client_is_premium",
+         "operator": "is_true",
+         "value": true
+         },
+        {"name": "weekday",
+         "operator": "greater_than_or_equal_to",
+         "value": 5
+         }
+    ]},
+        "actions": [
+            {"name": "discount_porc",
+             "params": {"porc": 0.25}
+             }
+        ]
+    },
+    {"conditions": {"all": [
+        {"name": "client_is_premium",
+         "operator": "is_true",
+         "value": true
+         },
+        {"name": "n_orders",
+         "operator": "greater_than",
+         "value": 10
+         },
+        {"name": "n_orders_mod_10",
+         "operator": "equal_to",
+         "value": 1
+         }
+    ]},
+        "actions": [
+            {"name": "discount_porc",
+             "params": {"porc": 0.1}
+             }
+        ]
+    }
+]
