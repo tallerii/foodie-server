@@ -1,7 +1,7 @@
 business-rules==1.0.1
 CacheControl==0.12.5
 cachetools==3.1.1
-certifi==2019.9.11
+certifi==2022.12.7
 chardet==3.0.4
 coverage==4.5.4
 coveralls==1.8.2
